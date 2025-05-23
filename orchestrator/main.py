@@ -12,7 +12,13 @@ LM_API_URL = os.getenv("LM_API_URL", "http://host.docker.internal:11434")
 
 MODEL_NAME = "qwen3-8b"
 
-print(f"Using LM API URL: {LM_API_URL}")
+def load_system_prompt():
+    prompt_path = os.getenv("SYSTEM_PROMPT_PATH", "system_prompt.txt")
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+SYSTEM_PROMPT = load_system_prompt()
+
 @app.post("/orchestrate")
 async def orchestrate(req: Request):
     data = await req.json()
@@ -21,12 +27,12 @@ async def orchestrate(req: Request):
     lm_payload = {
         "model": MODEL_NAME,
         "messages": [
-            {"role": "system", "content": "You are a helpful AI assistant."},
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
         ],
-        "temperature": 0.7
-    }
-
+        "temperature": 0.7,
+        "max_tokens": 32768
+    }  
     headers = {"Content-Type": "application/json"}
 
     try:
