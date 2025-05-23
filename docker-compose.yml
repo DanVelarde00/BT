@@ -1,6 +1,4 @@
 # docker-compose.yml
-version: '3.9'
-
 services:
   orchestrator:
     build: ./orchestrator
@@ -9,3 +7,39 @@ services:
     environment:
       - LM_API_URL=http://host.docker.internal:1234
       - MODEL_NAME=qwen3-8b
+  planner:
+    build: ./planner
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./planner/.env
+
+  coder:
+    build: ./coder
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./coder/.env
+
+  critic:
+    build: ./critic
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./critic/.env
+
+  memory:
+    build: ./memory
+    ports:
+      - "8004:8004"
+    env_file:
+      - ./memory/.env
+
+  logic:
+    build: ./logic
+    ports:
+      - "8005:8005"
+    env_file:
+      - ./logic/.env
+
+
