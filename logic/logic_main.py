@@ -8,7 +8,7 @@ load_dotenv()
 
 app = FastAPI()
 
-LM_API_URL = os.getenv("LM_API_URL", "http://host.docker.internal:1234")
+LOGIC_URL = os.getenv("LM_API_URL", "http://host.docker.internal:1234")
 MODEL_NAME = os.getenv("MODEL_NAME", "phi-4")
 
 @app.post("/route")
@@ -33,7 +33,7 @@ Respond ONLY in this format:
     }
 
     try:
-        response = requests.post(f"{LM_API_URL}/v1/chat/completions", json=payload)
+        response = requests.post(f"{LOGIC_URL}/v1/chat/completions", json=payload)
         response.raise_for_status()
         model_output = response.json()
         raw_text = model_output["choices"][0]["message"]["content"]
@@ -52,3 +52,4 @@ Respond ONLY in this format:
             "error": str(e),
             "details": response.text if 'response' in locals() else "No response from model"
         }
+
