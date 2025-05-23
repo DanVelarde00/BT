@@ -2,11 +2,20 @@ from fastapi import FastAPI, Request
 import requests
 import os
 from dotenv import load_dotenv
-
-load_dotenv()
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For dev only. Restrict in prod.
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+load_dotenv()
 
 LM_API_URL = os.getenv("LM_API_URL", "http://host.docker.internal:11434")
 
