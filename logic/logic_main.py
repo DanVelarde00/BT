@@ -18,7 +18,7 @@ async def route(req: Request):
 
     prompt = f"""
 You are the decision-making core of a modular AI system.
-Given this user instruction: "{instruction}"
+Given this user instruction: \"{instruction}\"
 Return a JSON object identifying which agent should handle the task first, and optionally any follow-up agents.
 
 Respond ONLY in this format:
@@ -35,6 +35,20 @@ Respond ONLY in this format:
     try:
         response = requests.post(f"{LM_API_URL}/v1/chat/completions", json=payload)
         response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        return {"error": str(e), "details": response.text if 'response' in locals() else "No response from logic agent"}
+        model_output = response.json()
+        raw_text = model_output["choices"][0]["message"]["content"]
+
+        # Extract JSON from within ```json ... ``` or similar blocks
+        import json, re
+        match = re.search(r"\{.*\}", raw_text, re.DOTALL)
+        if match:
+            routing_plan = json.loads(match.group(0))
+            return routing_plan
+        else:
+            return {"error": "No valid JSON found in model output", "raw": raw_text}
+
+    except Exception as e:
+        return {
+            "error": str(e),
+            "details": response.text if 'response' in locals() else "No response from model"
+        }
