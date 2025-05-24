@@ -1,1 +1,0 @@
-# critic - main.py
